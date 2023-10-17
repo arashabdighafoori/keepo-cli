@@ -1,7 +1,7 @@
 {
   "name": "keepo-cli",
   "version": "1.0.0",
-  "description": "An easy way to manage events, pipelines, services, stores and cqrs in Typescript.",
+  "description": "A convenient way to manage secrets and use .keep files.",
   "main": "./index.js",
   "bin": {
     "keepo": "./bin/keepo"

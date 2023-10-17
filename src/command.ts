@@ -16,6 +16,8 @@ export class Main {
       .description(await this.config.get<string>("description"))
       .version(await this.config.get<string>("version"));
 
+    if (program.args.length === 0) program.help();
+
     program.parse();
   }
 }

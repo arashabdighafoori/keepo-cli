@@ -2,7 +2,12 @@ import { Main } from "./command";
 import Configuration from "./configuration";
 
 export async function configure() {
-  const configuration = new Configuration({});
+  const configuration = new Configuration(
+    {
+      opener: "code",
+    },
+    true
+  );
   await configuration.intialize();
   return configuration;
 }

@@ -1,11 +1,15 @@
 import fs from "fs";
 import { File } from "./file";
 
-interface ConfigurationOptions {}
+interface ConfigurationOptions {
+  opener?: string;
+}
 
 export default class Configuration {
-  private dir = process.env.APPDATA + "/.keepo/";
-  private filename = "config.json";
+  private readonly data_folder = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
+  private readonly dir = this.data_folder + "/.keepo/";
+  private readonly filename = "config.json";
+  
   private options: ConfigurationOptions = {};
   private package_json: { [key: string]: unknown } = {};
   private file: File;

@@ -29,6 +29,33 @@ export default class {
     ["BgGray"]: "\x1b[100m",
   };
 
+  static pre_defined = {
+    Info: (info: string) => {
+      return [
+        {
+          text: "• Keepo",
+          colors: [],
+        },
+        {
+          text: info,
+          colors: ["FgBlack", "BgCyan"],
+        },
+      ];
+    },
+    Warn: (info: string) => {
+      return [
+        {
+          text: "• Keepo",
+          colors: [],
+        },
+        {
+          text: info,
+          colors: ["FgBlack", "BgYellow"],
+        },
+      ];
+    },
+  };
+
   static wrap(text: string, colors: string[]) {
     let out = `${text}${this.colors.Reset}`;
     for (let i = 0; i < colors.length; i++) {
@@ -36,5 +63,28 @@ export default class {
       out = `${this.colors[color]}${out}`;
     }
     return out;
+  }
+
+  static wrap_all(blocks: { text: string; colors: string[] }[]) {
+    let out = "";
+    for (let i = 0; i < blocks.length; i++) {
+      const { text, colors } = blocks[i];
+
+      for (let j = 0; j < colors.length; j++) {
+        out += `${this.colors[colors[j]]}`;
+      }
+      out += `${text}${this.colors.Reset} `;
+    }
+    return out;
+  }
+
+  static info(info: string, blocks: { text: string; colors: string[] }[]) {
+    console.log("");
+    console.log(this.wrap_all([...this.pre_defined.Info(info), ...blocks]));
+  }
+
+  static warn(warn: string, blocks: { text: string; colors: string[] }[]) {
+    console.log("");
+    console.log(this.wrap_all([...this.pre_defined.Warn(warn), ...blocks]));
   }
 }

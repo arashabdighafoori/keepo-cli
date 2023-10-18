@@ -54,6 +54,18 @@ export default class {
         },
       ];
     },
+    Danger: (info: string) => {
+      return [
+        {
+          text: "• Keepo",
+          colors: [],
+        },
+        {
+          text: info,
+          colors: ["FgBlack", "BgRed"],
+        },
+      ];
+    },
   };
 
   static wrap(text: string, colors: string[]) {
@@ -79,12 +91,14 @@ export default class {
   }
 
   static info(info: string, blocks: { text: string; colors: string[] }[]) {
-    console.log("");
     console.log(this.wrap_all([...this.pre_defined.Info(info), ...blocks]));
   }
 
   static warn(warn: string, blocks: { text: string; colors: string[] }[]) {
-    console.log("");
     console.log(this.wrap_all([...this.pre_defined.Warn(warn), ...blocks]));
+  }
+
+  static danger(danger: string, blocks: { text: string; colors: string[] }[]) {
+    console.log(this.wrap_all([...this.pre_defined.Danger(danger), ...blocks]));
   }
 }

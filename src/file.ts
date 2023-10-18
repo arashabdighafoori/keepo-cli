@@ -9,6 +9,11 @@ export class File {
       if (!fs.existsSync(this.dir)) resolve();
     });
   }
+
+  public raw_exists() {
+    return fs.existsSync(this.dir + this.file);
+  }
+
   public ensure() {
     return new Promise<void>((resolve) => {
       if (!fs.existsSync(this.dir)) fs.mkdirSync(this.dir);

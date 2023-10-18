@@ -1,9 +1,9 @@
 import { Command } from "commander";
 import color from "./color";
 import Configuration from "./configuration";
+import { File } from "./file";
 
 export class Main {
-  argv: string[];
   settings_text = `
 ${color.wrap(
   `It's also possible to change the settings from "%appdata%/.keep/config.json" in windows "/Users/user/Library/Preferences/.keep/config.json" in os x or "/home/user/.local/share/.keep/config.json" in linux.`,
@@ -14,8 +14,24 @@ The possible settings:
 <opener> the command to open files, default: "code"
     `;
 
+  // #region props
+
+  argv: string[];
+  global: File;
+  cwd: File;
+
+  private readonly data_folder =
+    process.env.APPDATA ||
+    (process.platform == "darwin"
+      ? process.env.HOME + "/Library/Preferences"
+      : process.env.HOME + "/.local/share");
+  private readonly global_dir = this.data_folder + "/.keepo/";
+  // #endregion
+
   constructor(private config: Configuration) {
     this.argv = process.argv.slice(1);
+    this.global = new File(this.global_dir, ".keep");
+    this.cwd = new File(process.cwd() + "/", ".keep");
   }
 
   public async run() {
@@ -96,7 +112,38 @@ The possible settings:
     global
       .command("get")
       .description("display the value of a key in global keep.")
-      .argument("key", "the key to search for.");
+      .argument("key", "the key to search for.")
+      .action(async (key: string) => {
+        if (!this.global.raw_exists()) {
+          color.danger("NOT FOUND", [
+            {
+              text: `${key} was not found!`,
+              colors: ["FgRed"],
+            },
+          ]);
+        } else {
+          const content = JSON.parse(await this.global.read());
+          if (key in content) {
+            color.info("DISPLAY", [
+              {
+                text: `${key}:`,
+                colors: [],
+              },
+              {
+                text: String(content[key]),
+                colors: ["FgCyan"],
+              },
+            ]);
+          } else {
+            color.danger("NOT FOUND", [
+              {
+                text: `${key} was not found!`,
+                colors: ["FgRed"],
+              },
+            ]);
+          }
+        }
+      });
   }
 
   add_global_set(global: Command) {
@@ -104,7 +151,25 @@ The possible settings:
       .command("set")
       .description("write or update a value to keep in the global keep.")
       .argument("key", "the key to keep the value.")
-      .argument("value", "the value.");
+      .argument("value", "the value.")
+      .action(async (key, value) => {
+        let content: { [key: string]: unknown } = {};
+        if (this.global.raw_exists())
+          content = JSON.parse(await this.global.read());
+        content[key] = value;
+        this.global.write(this.secure(JSON.stringify(content), "GLOBAL"));
+
+        color.warn("UPDATE", [
+          {
+            text: `${key}:`,
+            colors: [],
+          },
+          {
+            text: value,
+            colors: ["FgCyan"],
+          },
+        ]);
+      });
   }
 
   add_global_open(global: Command) {
@@ -165,5 +230,9 @@ The possible settings:
           },
         ]);
       });
+  }
+
+  secure(content: string, encryption_name: string): string {
+    return content;
   }
 }

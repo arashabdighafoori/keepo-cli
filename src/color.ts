@@ -33,7 +33,7 @@ export default class {
     Info: (info: string) => {
       return [
         {
-          text: "• Keepo",
+          text: "keepo",
           colors: [],
         },
         {
@@ -45,7 +45,7 @@ export default class {
     Warn: (info: string) => {
       return [
         {
-          text: "• Keepo",
+          text: "keepo",
           colors: [],
         },
         {
@@ -57,7 +57,7 @@ export default class {
     Danger: (info: string) => {
       return [
         {
-          text: "• Keepo",
+          text: "keepo",
           colors: [],
         },
         {

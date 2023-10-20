@@ -51,6 +51,7 @@ The possible settings:
     this.add_global(program);
     this.add_settings(program);
 
+    console.log("");
     program.parse();
     if (program.args.length === 0) program.help();
   }
@@ -68,14 +69,112 @@ The possible settings:
         "write or update a value to keep in the current working directory."
       )
       .argument("key", "the key to keep the value.")
-      .argument("value", "the value.");
+      .argument("value", "the value.")
+      .action(async (key: string, value: string) => {
+        let content: { [key: string]: unknown } = {};
+        if (this.cwd.raw_exists()) content = JSON.parse(await this.cwd.read());
+        else{
+          color.warn("UPDATE", [
+            {
+              text: "create the .keep file.",
+              colors: ["FgYellow"],
+            },
+          ]);
+        }
+        content[key] = value;
+        this.cwd.write(this.secure(JSON.stringify(content), "GLOBAL"));
+
+        color.warn("UPDATE", [
+          {
+            text: `${key}:`,
+            colors: [],
+          },
+          {
+            text: value,
+            colors: ["FgYellow"],
+          },
+        ]);
+      });
+  }
+
+  add_get(program: Command) {
+    program
+      .command("get")
+      .description(
+        "display the value of a key in current directory or global keep."
+      )
+      .argument("key", "the key to search for.")
+      .action(async (key: string) => {
+        if (!this.cwd.raw_exists()) {
+          color.danger("NOT FOUND", [
+            {
+              text: `${key} was not found!`,
+              colors: ["FgRed"],
+            },
+          ]);
+        } else {
+          const content = JSON.parse(await this.cwd.read());
+          if (key in content) {
+            color.info("DISPLAY", [
+              {
+                text: `${key}:`,
+                colors: [],
+              },
+              {
+                text: String(content[key]),
+                colors: ["FgCyan"],
+              },
+            ]);
+          } else {
+            color.danger("NOT FOUND", [
+              {
+                text: `${key} was not found!`,
+                colors: ["FgRed"],
+              },
+            ]);
+          }
+        }
+      });
   }
 
   add_require(program: Command) {
     program
       .command("require")
       .description("add a key to requirements.")
-      .argument("key", "the required key.");
+      .argument("key", "the required key.")
+      .action(async (key: string) => {
+        const f = new File(process.cwd(), "\\.rkeep");
+        const contents: { values: string[] } = { values: [] };
+        if (f.raw_exists()) {
+          const parsed = JSON.parse(await f.read());
+          contents.values = parsed.values;
+        }
+        else{
+          color.warn("UPDATE", [
+            {
+              text: "create the .rkeep file.",
+              colors: ["FgYellow"],
+            },
+          ]);
+        }
+        if (!contents.values.includes(key)) {
+          contents.values.push(key);
+          await f.write(this.secure(JSON.stringify(contents), ""));
+          color.warn("UPDATE", [
+            {
+              text: `${key} was added to requirements.`,
+              colors: ["FgYellow"],
+            },
+          ]);
+        } else {
+          color.info("DISPLAY", [
+            {
+              text: `${key} is already required!`,
+              colors: ["FgCyan"],
+            },
+          ]);
+        }
+      });
   }
 
   add_open(program: Command) {
@@ -88,15 +187,6 @@ The possible settings:
       .description(
         "initialize the keep in the current directory with a specific encryption key, (or to add the encryption key for an existing .keep file)."
       );
-  }
-
-  add_get(program: Command) {
-    program
-      .command("get")
-      .description(
-        "display the value of a key in current directory or global keep."
-      )
-      .argument("key", "the key to search for.");
   }
 
   add_global(program: Command) {
@@ -156,6 +246,14 @@ The possible settings:
         let content: { [key: string]: unknown } = {};
         if (this.global.raw_exists())
           content = JSON.parse(await this.global.read());
+        else{
+          color.warn("UPDATE", [
+            {
+              text: "create the global .keep file.",
+              colors: ["FgYellow"],
+            },
+          ]);
+        }
         content[key] = value;
         this.global.write(this.secure(JSON.stringify(content), "GLOBAL"));
 
@@ -166,7 +264,7 @@ The possible settings:
           },
           {
             text: value,
-            colors: ["FgCyan"],
+            colors: ["FgYellow"],
           },
         ]);
       });
@@ -226,7 +324,7 @@ The possible settings:
           },
           {
             text: String(value),
-            colors: ["FgCyan"],
+            colors: ["FgYellow"],
           },
         ]);
       });

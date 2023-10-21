@@ -73,7 +73,7 @@ The possible settings:
       .action(async (key: string, value: string) => {
         let content: { [key: string]: unknown } = {};
         if (this.cwd.raw_exists()) content = JSON.parse(await this.cwd.read());
-        else{
+        else {
           color.warn("UPDATE", [
             {
               text: "create the .keep file.",
@@ -82,7 +82,7 @@ The possible settings:
           ]);
         }
         content[key] = value;
-        this.cwd.write(this.secure(JSON.stringify(content), "GLOBAL"));
+        this.cwd.write(this.secure(JSON.stringify(content), "LOCAL"));
 
         color.warn("UPDATE", [
           {
@@ -148,8 +148,7 @@ The possible settings:
         if (f.raw_exists()) {
           const parsed = JSON.parse(await f.read());
           contents.values = parsed.values;
-        }
-        else{
+        } else {
           color.warn("UPDATE", [
             {
               text: "create the .rkeep file.",
@@ -178,7 +177,29 @@ The possible settings:
   }
 
   add_open(program: Command) {
-    program.command("open").description("open the keep in a temporary file.");
+    program
+      .command("open")
+      .description("open the keep in a temporary file.")
+      .action(() => {
+        if (!this.cwd.raw_exists()) {
+          color.warn("UPDATE", [
+            {
+              text: "create the .keep file.",
+              colors: ["FgYellow"],
+            },
+          ]);
+          this.cwd.write("{}");
+        }
+        this.cwd.open(
+          "code",
+          (content) => {
+            return this.decrypt(content, "LOCAL");
+          },
+          (content) => {
+            return this.secure(content, "LOCAL");
+          }
+        );
+      });
   }
 
   add_init(program: Command) {
@@ -246,7 +267,7 @@ The possible settings:
         let content: { [key: string]: unknown } = {};
         if (this.global.raw_exists())
           content = JSON.parse(await this.global.read());
-        else{
+        else {
           color.warn("UPDATE", [
             {
               text: "create the global .keep file.",
@@ -273,7 +294,27 @@ The possible settings:
   add_global_open(global: Command) {
     global
       .command("open")
-      .description("open the global keep in a temporary file.");
+      .description("open the global keep in a temporary file.")
+      .action(() => {
+        if (!this.global.raw_exists()) {
+          color.warn("UPDATE", [
+            {
+              text: "create the global .keep file.",
+              colors: ["FgYellow"],
+            },
+          ]);
+          this.global.write("{}");
+        }
+        this.global.open(
+          "code",
+          (content) => {
+            return this.decrypt(content, "LOCAL");
+          },
+          (content) => {
+            return this.secure(content, "LOCAL");
+          }
+        );
+      });
   }
 
   add_settings(program: Command) {
@@ -331,6 +372,9 @@ The possible settings:
   }
 
   secure(content: string, encryption_name: string): string {
+    return content;
+  }
+  decrypt(content: string, encryption_name: string): string {
     return content;
   }
 }

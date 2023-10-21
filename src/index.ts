@@ -1,4 +1,5 @@
 import Configuration from "./configuration";
+import { File } from "./file";
 import { configure, startup } from "./startup";
 
 configure().then(async (configuration: Configuration) => {
@@ -7,7 +8,8 @@ configure().then(async (configuration: Configuration) => {
 
 function generatePassword() {
   const length = 8,
-    charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#?)(@$%&*^+=-";
+    charset =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#?)(@$%&*^+=-";
   let retVal = "";
   for (let i = 0, n = charset.length; i < length; ++i) {
     retVal += charset.charAt(Math.floor(Math.random() * n));

@@ -1,13 +1,8 @@
 import fs from "fs";
+import constants from "./constants";
 import { File } from "./file";
 
 export default class Configuration {
-  private readonly data_folder =
-    process.env.APPDATA ||
-    (process.platform == "darwin"
-      ? process.env.HOME + "/Library/Preferences"
-      : process.env.HOME + "/.local/share");
-  private readonly dir = this.data_folder + "/.keepo/";
   private readonly filename = "config.json";
 
   private options: { [key: string]: unknown } = {};
@@ -18,7 +13,7 @@ export default class Configuration {
     private default_options: { [key: string]: unknown },
     private force_remap = false
   ) {
-    this.file = new File(this.dir, this.filename);
+    this.file = new File(constants.globaldir, this.filename);
   }
 
   public async intialize() {

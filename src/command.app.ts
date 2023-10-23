@@ -70,6 +70,10 @@ export default class AppCommand {
       .command("init")
       .description(
         "initialize the keep in the current directory with a specific encryption key, (or to add the encryption key for an existing .keep file)."
-      );
+      )
+      .argument("key", "the key to use to initialize the folder.")
+      .action((key: string) => {
+        mediator.fire("init", { key });
+      });
   }
 }

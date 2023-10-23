@@ -21,4 +21,22 @@ export default function AddPrompts() {
       });
     });
   });
+
+  mediator.register_handler("prompt:initialize", () => {
+    return new Promise<void>((resolve) => {
+      prompts({
+        type: "confirm",
+        name: "confirm",
+        message: color.wrap_all([
+          ...color.pre_defined.Info(`INPUT`),
+          {
+            text: `A key already exists for this folder, confirm to reinitialize and encrypt everything again`,
+            colors: [`FgCyan`],
+          },
+        ]),
+      }).then(() => {
+        resolve();
+      });
+    });
+  });
 }

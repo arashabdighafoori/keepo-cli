@@ -5,6 +5,7 @@ import constants from "./constants";
 import AddConfiguration from "./handlers/configuration";
 import { AddDecryption } from "./handlers/decryption";
 import { AddEncryption } from "./handlers/encryption";
+import AddKeyOperations from "./handlers/keys";
 import AddLog from "./handlers/log";
 import AddOperations from "./handlers/operations";
 import AddPrompts from "./handlers/prompt";
@@ -16,6 +17,7 @@ export async function configure() {
   AddEncryption();
   AddDecryption();
   AddPrompts();
+  AddKeyOperations();
   AddSettingsOperations();
   await AddConfiguration();
 

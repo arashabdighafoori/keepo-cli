@@ -1,3 +1,4 @@
+import { mediator } from "@arashghafoori/mediator";
 import { Command } from "commander";
 import color from "./color";
 import Configuration from "./configuration";
@@ -13,7 +14,7 @@ export default class SettingsCommand {
     <opener> the command to open files, default: "code"
         `;
 
-  constructor(private config: Configuration, public program: Command) {
+  constructor(public program: Command) {
     this.add_settings(program);
   }
 
@@ -32,18 +33,7 @@ export default class SettingsCommand {
       .addHelpText("after", this.settings_text)
       .argument("name", "the name of the setting.")
       .action((name) => {
-        this.config.get(name).then((value) => {
-          color.info("DISPLAY", [
-            {
-              text: `${name}:`,
-              colors: [],
-            },
-            {
-              text: String(value),
-              colors: ["FgCyan"],
-            },
-          ]);
-        });
+        mediator.fire("settings:get", { key: name });
       });
   }
 
@@ -57,17 +47,7 @@ export default class SettingsCommand {
       .argument("name", "the name of the setting.")
       .argument("value", "the value of the setting.")
       .action((name, value) => {
-        this.config.set(name, value);
-        color.warn("UPDATE", [
-          {
-            text: `${name}:`,
-            colors: [],
-          },
-          {
-            text: String(value),
-            colors: ["FgYellow"],
-          },
-        ]);
+        mediator.fire("settings:set", { key: name, value });
       });
   }
 }

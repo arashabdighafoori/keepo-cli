@@ -11,6 +11,9 @@ export default class {
       ? process.env.HOME + "/Library/Preferences"
       : process.env.HOME + "/.local/share");
 
-  public static globaldir = this.root + "/.keepo/"
+  public static globaldir = this.root + "/.keepo/";
 
+  public static default_configuration = {
+    opener: "code",
+  };
 }

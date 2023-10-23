@@ -1,3 +1,4 @@
+import { mediator } from "@arashghafoori/mediator";
 import fs from "fs";
 import constants from "./constants";
 import { File } from "./file";
@@ -9,18 +10,16 @@ export default class Configuration {
   private package_json: { [key: string]: unknown } = {};
   private file: File;
 
-  constructor(
-    private default_options: { [key: string]: unknown },
-    private force_remap = false
-  ) {
+  constructor(private force_remap = false) {
     this.file = new File(constants.globaldir, this.filename);
   }
 
-  public async intialize() {
+  public async intialize(default_options: { [key: string]: unknown }) {
     await this.file.ensure();
-    if (this.force_remap) {
-      this.file.write(JSON.stringify(this.default_options));
-      this.options = this.default_options;
+    if (this.force_remap || !this.file.raw_exists()) {
+      mediator.fire("log:update", "intializing the configuration.");
+      this.file.write(JSON.stringify(default_options));
+      this.options = default_options;
     } else {
       const reponse = await this.file.read();
       this.options = JSON.parse(reponse);

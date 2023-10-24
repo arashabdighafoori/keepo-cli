@@ -49,7 +49,7 @@ export class File {
     });
   }
 
-  public open(opener: string, decrypter: (content: string) => string) {
+  public open(opener: string, decrypter: (content: string) => Promise<string>) {
     return new Promise<string>((resolve, reject) => {
       (async () => {
         const copy_loc = await this.copy(constants.tmpdir, decrypter);
@@ -63,29 +63,41 @@ export class File {
     });
   }
 
-  public save(copy_loc: string, encrypter: (content: string) => string) {
-    this.write(
-      encrypter(JSON.parse(fs.readFileSync(copy_loc, { encoding: "utf8" })))
+  public save(
+    copy_loc: string,
+    encrypter: (content: string) => Promise<string>
+  ) {
+    encrypter(JSON.parse(fs.readFileSync(copy_loc, { encoding: "utf8" }))).then(
+      (encrypted) => {
+        this.write(encrypted);
+        fs.unlinkSync(copy_loc);
+      }
     );
-    fs.unlinkSync(copy_loc);
   }
 
   public close(copy_loc: string) {
     fs.unlinkSync(copy_loc);
   }
 
-  public copy(dir: string, decrypter: (content: string) => string) {
-    const stamp = Date.now().toString();
+  public copy(dir: string, decrypter: (content: string) => Promise<string>) {
+    const path = `${dir}\\keep-temporary.json`;
     return new Promise<string>((resolve, reject) => {
       this.read().then((content) => {
-        fs.writeFile(
-          `${dir}\\keep-${stamp}.temp`,
-          decrypter(content),
-          (err) => {
+        if (content === "{}") {
+          fs.writeFile(path, content, (err) => {
             if (err) reject(err);
-            else resolve(`${dir}\\keep-${stamp}.temp`);
-          }
-        );
+            else resolve(path);
+          });
+        } else {
+          decrypter(content)
+            .then((content) => JSON.stringify(JSON.parse(content), null, 2))
+            .then((c) => {
+              fs.writeFile(path, c, (err) => {
+                if (err) reject(err);
+                else resolve(path);
+              });
+            });
+        }
       });
     });
   }

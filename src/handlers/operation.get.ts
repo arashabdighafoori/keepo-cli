@@ -11,8 +11,9 @@ export default function AddGetOperations() {
   mediator.on("get", (input: Get) => {
     const { key, type } = input;
 
+    const path = type == "LOCAL" ? process.cwd() : constants.globaldir;
     const file = new File(
-      type == "LOCAL" ? process.cwd() : constants.globaldir,
+      path,
       "/.keep"
     );
 
@@ -22,7 +23,7 @@ export default function AddGetOperations() {
     file
       .read()
       .then((data) => {
-        return mediator.handle({ name: "decrypt", encrypted: data }) as string;
+        return mediator.handle({ name: "decrypt", encrypted: data, folder: path }) as string;
       })
       .then((data: string) => {
         const content = JSON.parse(data);

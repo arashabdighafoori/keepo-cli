@@ -14,12 +14,9 @@ export class Main {
       .name("keepo")
       .description(await this.config.get<string>("description"))
       .version(await this.config.get<string>("version"))
-      .hook("preAction", () => {
-        console.log("");
-      })
 
     new AppCommand(program);
-    new SettingsCommand(this.config, program);
+    new SettingsCommand(program);
     new GlobalCommand(program);
 
     program.parse();

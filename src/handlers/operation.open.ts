@@ -11,13 +11,11 @@ export default function AddOpenOperations() {
   mediator.on("open", async (input: Open) => {
     const { type } = input;
 
-    const file = new File(
-      type == "LOCAL" ? process.cwd() : constants.globaldir,
-      "/.keep"
-    );
+    const path = type == "LOCAL" ? process.cwd() : constants.globaldir;
+    const file = new File(path, "/.keep");
 
     if (!file.raw_exists()) {
-      mediator.fire("log:update", `create the .keep file.`);
+      mediator.fire("log:update", `creating the .keep file.`);
       file.write("{}");
     }
 
@@ -25,10 +23,12 @@ export default function AddOpenOperations() {
     const opener = await configuration.get<string>("opener");
 
     const copy_loc = await file.open(opener, (content) => {
-      return mediator.handle({
+      const p = mediator.handle({
         name: "decrypt",
+        folder: path,
         encrypted: content,
-      }) as string;
+      }) as Promise<string>;
+      return p;
     });
 
     const prompt = mediator.handle({
@@ -38,11 +38,12 @@ export default function AddOpenOperations() {
     prompt
       .then((value) => {
         if (value.toLowerCase() == "save") {
-          file.save(copy_loc, (content) => {
-            return mediator.handle({
+          file.save(copy_loc, async (content) => {
+            return await (mediator.handle({
               name: "encrypt",
+              folder: path,
               content: JSON.stringify(content),
-            }) as string;
+            }) as Promise<string>);
           });
         } else {
           file.close(copy_loc);

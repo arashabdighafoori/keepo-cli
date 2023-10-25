@@ -30,8 +30,36 @@
 
 ## Table of Contents
 
+- [Features](#features)
+- [Instalation](#instalation)
 - [License](#license)
 
+<br />
+
+## Features
+
+- Manage secrets easily
+- Keep secrets encrypted and available only with keys
+- List required values
+
+<br />
+
+## Installation
+
+```
+npm install -g keepo-cli
+```
+
+<br />
+
+## Usage
+
+If you have a .keep file in the repo and you know the encryption key use `keepo init <your-encryption-key>` to initalize the directory. ( run the command in the directory with .keep file ).
+
+To keep a value use `keepo set <key> <value>`
+or use `keepo open` and edit the file in json format then save it.
+
+To see the value of a given key, you can both use `keepo open` and then discard the file or `keepo get <key>`.
 <br />
 
 ## License

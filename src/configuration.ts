@@ -26,7 +26,7 @@ export default class Configuration {
     }
 
     this.package_json = JSON.parse(
-      fs.readFileSync(`${__dirname}/package.json`, "utf8")
+      fs.readFileSync(`${__dirname}/../../package.json`, "utf8")
     );
   }
 

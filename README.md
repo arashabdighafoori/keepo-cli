@@ -31,7 +31,7 @@
 ## Table of Contents
 
 - [Features](#features)
-- [Instalation](#instalation)
+- [Installation](#installation)
 - [License](#license)
 
 <br />
@@ -54,9 +54,9 @@ npm install -g keepo-cli
 
 ## Usage
 
-If you have a .keep file in the repo and you know the encryption key use `keepo init <your-encryption-key>` to initalize the directory. ( run the command in the directory with .keep file ).
+If you have a .keep file in the repo and you know the encryption key, use `keepo init <your-encryption-key>` to initalize the directory. ( run the command in the directory with .keep file ).
 
-To keep a value use `keepo set <key> <value>`
+To store a value, use `keepo set <key> <value>`
 or use `keepo open` and edit the file in json format then save it.
 
 To see the value of a given key, you can both use `keepo open` and then discard the file or `keepo get <key>`.
